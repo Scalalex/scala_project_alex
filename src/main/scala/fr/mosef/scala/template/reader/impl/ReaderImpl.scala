@@ -13,18 +13,23 @@ class ReaderImpl(sparkSession: SparkSession) extends Reader {
       .load(path)
   }
 
-  def read(path: String): DataFrame = {
+  def readCsv(path: String): DataFrame = {
+    // Lecture de fichiers CSV avec des options
     sparkSession
       .read
-      .option("sep", ",")
-      .option("inferSchema", "true")
       .option("header", "true")
+      .option("inferSchema", "true")
       .format("csv")
       .load(path)
   }
 
   def read(): DataFrame = {
-    sparkSession.sql("SELECT 'Empty DataFrame for unit testing implementation")
+    // Implémentation pour la lecture des tables Hive
+    sparkSession.table("nom_de_la_table_Hive")
   }
 
+  // Nouvelle méthode pour la lecture de fichiers Parquet
+  def readParquet(path: String): DataFrame = {
+    sparkSession.read.parquet(path)
+  }
 }

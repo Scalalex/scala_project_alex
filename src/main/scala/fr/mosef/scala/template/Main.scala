@@ -5,8 +5,8 @@ import fr.mosef.scala.template.processor.Processor
 import fr.mosef.scala.template.processor.impl.ProcessorImpl
 import fr.mosef.scala.template.reader.Reader
 import fr.mosef.scala.template.reader.impl.ReaderImpl
-import org.apache.spark.sql.{DataFrame, SparkSession}
 import fr.mosef.scala.template.writer.Writer
+import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.SparkConf
 import com.globalmentor.apache.hadoop.fs.BareLocalFileSystem
 import org.apache.hadoop.fs.FileSystem
@@ -46,7 +46,7 @@ object Main extends App with Job {
     .appName("Scala Template")
     .enableHiveSupport()
     .getOrCreate()
-  
+
   sparkSession
     .sparkContext
     .hadoopConfiguration
@@ -59,7 +59,22 @@ object Main extends App with Job {
   val src_path = SRC_PATH
   val dst_path = DST_PATH
 
-  val inputDF: DataFrame = reader.read(src_path)
+val inputDF: DataFrame = {
+  if (src_path.endsWith(".csv")) {
+    reader.readCsv(src_path)
+  } else if (src_path.endsWith(".parquet")) {
+    reader.readParquet(src_path)
+  } else if (src_path.startsWith("hive://")) {
+    // Implémente la lecture des tables Hive si nécessaire
+    // reader.readHiveTable(src_path)
+    // Si tu n'as pas implémenté cette méthode, tu devras écrire la logique ici
+    throw new UnsupportedOperationException("Reading from Hive is not implemented yet")
+  } else {
+    throw new IllegalArgumentException("Unsupported file format")
+  }
+}
+
+
   val processedDF: DataFrame = processor.process(inputDF)
   writer.write(processedDF, "overwrite", dst_path)
 
