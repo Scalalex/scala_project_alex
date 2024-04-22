@@ -52,30 +52,39 @@ object Main extends App with Job {
     .hadoopConfiguration
     .setClass("fs.file.impl",  classOf[BareLocalFileSystem], classOf[FileSystem])
 
-
   val reader: Reader = new ReaderImpl(sparkSession)
   val processor: Processor = new ProcessorImpl()
   val writer: Writer = new Writer()
   val src_path = SRC_PATH
   val dst_path = DST_PATH
 
-val inputDF: DataFrame = {
-  if (src_path.endsWith(".csv")) {
-    reader.readCsv(src_path)
-  } else if (src_path.endsWith(".parquet")) {
-    reader.readParquet(src_path)
-  } else if (src_path.startsWith("hive://")) {
-    // Implémente la lecture des tables Hive si nécessaire
-    // reader.readHiveTable(src_path)
-    // Si tu n'as pas implémenté cette méthode, tu devras écrire la logique ici
-    throw new UnsupportedOperationException("Reading from Hive is not implemented yet")
-  } else {
-    throw new IllegalArgumentException("Unsupported file format")
+  val inputDF: DataFrame = {
+    if (src_path.endsWith(".csv")) {
+      reader.readCsv(src_path)
+    } else if (src_path.endsWith(".parquet")) {
+      reader.readParquet(src_path)
+    } else if (src_path.startsWith("hive://")) {
+      throw new UnsupportedOperationException("Reading from Hive is not implemented yet")
+    } else {
+      throw new IllegalArgumentException("Unsupported file format")
+    }
   }
-}
 
+  override def process(report: String): DataFrame = {
+    processor.process(inputDF, report)
+  }
 
-  val processedDF: DataFrame = processor.process(inputDF)
+  // Ajout de la sélection du rapport à générer depuis la ligne de commande
+  val report: String = try {
+    cliArgs(3)
+  } catch {
+    case _: java.lang.ArrayIndexOutOfBoundsException => {
+      println("No report specified, defaulting to 'report1'")
+      "report1"
+    }
+  }
+
+  val processedDF: DataFrame = process(report)
   writer.write(processedDF, "overwrite", dst_path)
 
 }

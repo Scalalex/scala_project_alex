@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>Scalalex</groupId>
     <artifactId>scala_project_alex</artifactId>
-    <version>1.3</version>
+    <version>0.2</version>
 
     <properties>
         <encoding>UTF-8</encoding>
@@ -110,7 +110,7 @@
         <repository>
             <id>github</id>
             <name>GitHub Packages</name>
-            <url>https://github.com/Scalalex/scala_project_alex</url>
+            <url>https://maven.pkg./github.com/Scalalex/scala_project_alex</url>
         </repository>
     </distributionManagement>
 </project>

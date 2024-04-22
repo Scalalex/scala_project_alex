@@ -4,6 +4,7 @@ import fr.mosef.scala.template.processor.Processor
 import fr.mosef.scala.template.reader.Reader
 import fr.mosef.scala.template.writer.Writer
 import org.apache.spark.sql.DataFrame
+
 trait Job {
   val reader: Reader
   val processor: Processor
@@ -12,4 +13,6 @@ trait Job {
   val dst_path: String
   val inputDF: DataFrame
   val processedDF: DataFrame
+
+  def process(report: String): DataFrame
 }
