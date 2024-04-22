@@ -70,13 +70,8 @@ object Main extends App with Job {
     }
   }
 
-  override def process(report: String): DataFrame = {
-    processor.process(inputDF, report)
-  }
-
-  // Ajout de la sélection du rapport à générer depuis la ligne de commande
   val report: String = try {
-    cliArgs(3)
+    cliArgs(2) // Utilisation du troisième argument
   } catch {
     case _: java.lang.ArrayIndexOutOfBoundsException => {
       println("No report specified, defaulting to 'report1'")
@@ -86,5 +81,9 @@ object Main extends App with Job {
 
   val processedDF: DataFrame = process(report)
   writer.write(processedDF, "overwrite", dst_path)
+
+  override def process(report: String): DataFrame = {
+    processor.process(inputDF, report)
+  }
 
 }
